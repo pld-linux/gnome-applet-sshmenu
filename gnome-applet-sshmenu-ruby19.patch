@@ -1,0 +1,10 @@
+--- sshmenu-3.18/lib/sshmenu.rb~	2009-08-24 10:25:06.000000000 +0200
++++ sshmenu-3.18/lib/sshmenu.rb	2010-08-01 00:03:37.308916597 +0200
+@@ -1,6 +1,6 @@
+ require 'getoptlong'
+ require 'pathname'
+-require 'ftools'
++require 'fileutils'
+ require 'singleton'
+ require 'gtk2'
+ require 'yaml'
