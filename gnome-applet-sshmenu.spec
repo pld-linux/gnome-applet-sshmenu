@@ -1,7 +1,7 @@
 Summary:	A GNOME panel applet for connecting to hosts using SSH
 Name:		gnome-applet-sshmenu
 Version:	3.18
-Release:	0.5
+Release:	1
 License:	BSD-like
 Group:		Applications
 Source0:	http://dl.sourceforge.net/sshmenu/sshmenu-%{version}.tar.gz
@@ -52,6 +52,8 @@ mv $RPM_BUILD_ROOT%{_libdir}/ruby/{1.8,1.9}
 install -d $RPM_BUILD_ROOT%{_pixmapsdir}
 mv $RPM_BUILD_ROOT{%{_iconsdir}/hicolor/48x48/apps,%{_pixmapsdir}}/gnome-sshmenu-applet.png
 
+echo ".so sshmenu.1" >$RPM_BUILD_ROOT%{_mandir}/man1/%{name}.1
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -63,7 +65,7 @@ rm -rf $RPM_BUILD_ROOT
 %{ruby_rubylibdir}/*sshmenu.rb
 %attr(755,root,root) %{_libdir}/sshmenu-applet
 %{_pixmapsdir}/gnome-sshmenu-applet.png
-%{_mandir}/man1/sshmenu*.1*
+%{_mandir}/man1/*sshmenu*.1*
 
 %files -n bash-completion-sshmenu
 %defattr(644,root,root,755)
