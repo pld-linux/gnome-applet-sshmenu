@@ -1,12 +1,14 @@
 Summary:	A GNOME panel applet for connecting to hosts using SSH
-Name:		sshmenu
+Name:		gnome-applet-sshmenu
 Version:	3.18
-Release:	0.3
+Release:	0.5
 License:	BSD-like
 Group:		Applications
-Source0:	http://dl.sourceforge.net/sshmenu/%{name}-%{version}.tar.gz
+Source0:	http://dl.sourceforge.net/sshmenu/sshmenu-%{version}.tar.gz
 # Source0-md5:	7e7f43135fd112be3c173ec8585d6b98
 Patch0:		%{name}-ruby19.patch
+Patch1:		%{name}-undebianize.patch
+Patch2:		%{name}-pixmap.patch
 URL:		http://sshmenu.sourceforge.net/
 Requires:	ruby-gnome2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -28,8 +30,10 @@ This package provides bash-completion for sshmenu.
 Pakiet ten dostarcza bashowe uzupełnianie nazw dla sshmenu.
 
 %prep
-%setup -q
+%setup -q -n sshmenu-%{version}
 %patch0 -p1
+%patch1 -p1
+%patch2 -p1
 
 sed -i -e 's|/usr/lib$|%{_libdir}/|g' \
        -e 's|gnome-panel/sshmenu-applet|sshmenu-applet|g' Makefile
@@ -45,6 +49,9 @@ rm -rf $RPM_BUILD_ROOT
 
 mv $RPM_BUILD_ROOT%{_libdir}/ruby/{1.8,1.9}
 
+install -d $RPM_BUILD_ROOT%{_pixmapsdir}
+mv $RPM_BUILD_ROOT{%{_iconsdir}/hicolor/48x48/apps,%{_pixmapsdir}}/gnome-sshmenu-applet.png
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -55,7 +62,7 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/bonobo/servers/*.server
 %{ruby_rubylibdir}/*sshmenu.rb
 %attr(755,root,root) %{_libdir}/sshmenu-applet
-%{_iconsdir}/hicolor/48x48/apps/gnome-sshmenu-applet.png
+%{_pixmapsdir}/gnome-sshmenu-applet.png
 %{_mandir}/man1/sshmenu*.1*
 
 %files -n bash-completion-sshmenu

@@ -1,0 +1,59 @@
+diff -ur sshmenu-3.18/lib/gnome-sshmenu.rb sshmenu-3.18-undebian/lib/gnome-sshmenu.rb
+--- sshmenu-3.18/lib/gnome-sshmenu.rb	2009-08-24 10:25:06.000000000 +0200
++++ sshmenu-3.18-undebian/lib/gnome-sshmenu.rb	2010-08-07 22:05:34.055033116 +0200
+@@ -138,22 +138,6 @@
+       return need_sep
+     end
+ 
+-    # Debian's 'popcon' (Popularity Contest) normally reports the sshmenu-gnome
+-    # package as 'installed but not used' since the panel applet does not
+-    # access /usr/bin/sshmenu-gnome.  This routine updates the atime on that
+-    # file each time the applet starts.  This functionality is completely
+-    # non-essential and can be safely disabled in the unlikely event that it
+-    # causes some problem.
+-
+-    def appease_popcon # :nodoc:
+-      # update access time on a file the Debian popcon is looking at :-)
+-      begin
+-        open('/usr/bin/sshmenu-gnome') { |f| f.readline }
+-      rescue Exception
+-      end
+-      super
+-    end
+-
+   end
+ 
+   ############################################################################
+diff -ur sshmenu-3.18/lib/sshmenu.rb sshmenu-3.18-undebian/lib/sshmenu.rb
+--- sshmenu-3.18/lib/sshmenu.rb	2009-08-24 10:25:06.000000000 +0200
++++ sshmenu-3.18-undebian/lib/sshmenu.rb	2010-08-07 22:05:48.255035867 +0200
+@@ -369,8 +369,6 @@
+       # For multi-DISPLAY setups
+       @@display = evbox.screen
+       ENV['DISPLAY'] = @@display.display_name
+-
+-      appease_popcon
+     end
+ 
+     # Build a text entry box with resize handle for display next to the main
+@@ -1177,20 +1175,6 @@
+       puts message
+     end
+ 
+-    # Debian's 'popcon' (Popularity Contest) normally reports the sshmenu
+-    # package as 'installed but not used' since the panel applet does not
+-    # access /usr/bin/sshmenu.  This routine updates the atime on that file
+-    # each time the applet starts.  This functionality is completely
+-    # non-essential and can be safely disabled in the unlikely event that it
+-    # causes some problem.
+-
+-    def appease_popcon   # :nodoc:
+-      begin
+-        open('/usr/bin/sshmenu') { |f| f.readline }
+-      rescue Exception
+-      end
+-    end
+-
+   end
+ 
+ 

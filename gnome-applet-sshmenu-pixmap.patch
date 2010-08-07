@@ -1,0 +1,146 @@
+diff -ur sshmenu-3.18/lib/sshmenu.rb sshmenu-3.18-pixmap/lib/sshmenu.rb
+--- sshmenu-3.18/lib/sshmenu.rb	2009-08-24 10:25:06.000000000 +0200
++++ sshmenu-3.18-pixmap/lib/sshmenu.rb	2010-08-07 22:26:36.550033809 +0200
+@@ -197,6 +197,7 @@
+     def Factory.option_defaults
+       return {
+         :window         => nil,
++        :applet         => 0,
+         :model_class    => SSHMenu::Config,
+         :args           => ARGV
+       }
+@@ -282,6 +283,9 @@
+       getopts(@options[:args])
+       @app_win     = @options[:window] || default_container
+       @entry_box   = nil
++      if @options[:applet]
++        @orientation = @options[:applet]
++      end
+ 
+       inject_defaults
+       get_initial_config
+@@ -345,15 +349,13 @@
+ 
+       evbox = Gtk::EventBox.new
+       evbox.signal_connect('button-press-event') { |w,e| on_click(w,e) }
+-      hbox.pack_start(evbox, false, false)
++      hbox.pack_start(evbox, true, true)
+ 
+-      @frame = Gtk::Frame.new
+-      set_button_border;
+-      evbox.add(@frame)
+-
+-      label = Gtk::Label.new("SSH")
+-      label.set_padding(2, 2)
+-      @frame.add(label)
++      @size = @app_win.allocation.height
++      @pixbuf = Gdk::Pixbuf.new("/usr/share/pixmaps/gnome-sshmenu-applet.png")
++      @image = Gtk::Image.new(nil)
++      evbox.signal_connect('expose-event') { |w,e| on_expose(w,e) }
++      evbox.add(@image)
+ 
+       tooltips = Gtk::Tooltips.new
+       tooltips.set_tip(evbox, @config.tooltip_text, nil);
+@@ -622,12 +624,6 @@
+       completion.insert_action_markup(i, "<b>Add menu item:</b> #{text}")
+     end
+ 
+-    # Show/hide the border around the main UI 'button'
+-
+-    def set_button_border
+-      @frame.shadow_type = @config.hide_border? ? Gtk::SHADOW_NONE : Gtk::SHADOW_OUT;
+-    end
+-
+     # Accessor for the SSHMenu::ClassMapper singleton object
+ 
+     def mapper
+@@ -807,6 +803,19 @@
+        return false
+     end
+ 
++    def on_expose(widget, event)
++       if @orientation
++         newsize = widget.allocation.height
++       else
++         newsize = widget.allocation.width
++       end
++       if @size != newsize
++	 @size = newsize
++         @image.set_pixbuf(@pixbuf.scale(newsize, newsize))
++       end
++       return false
++    end
++
+     # Takes a code block and schedules it to be called when option processing
+     # is complete
+ 
+@@ -1132,7 +1141,6 @@
+       dialog_class = mapper.get_class('app.dialog.prefs')
+       dialog_class.new(self, @config).invoke
+       show_hide_text_entry
+-      set_button_border
+     end
+ 
+     # Called from the SSHMenu::PrefsDialog if the user clicks on the home page
+@@ -1402,21 +1410,6 @@
+       return @globals['tooltip']
+     end
+ 
+-    # Returns true if the 'hide button border' option is enabled
+-
+-    def hide_border?
+-      if opt = get('hide_border')
+-        return opt != 0
+-      end
+-      return false
+-    end
+-
+-    # Sets the state of the 'hide button border' option
+-
+-    def hide_border=(val)
+-      set('hide_border', val ? 1 : 0)
+-    end
+-
+     # Returns true if the 'tear-off menus' option is enabled
+ 
+     def menus_tearoff?
+@@ -1879,7 +1872,6 @@
+       if @app.can_show_entry?
+         @config.show_entry   = @chk_show_entry.active?
+       end
+-      @config.hide_border    = @chk_hide_border.active?
+       @config.menus_tearoff  = @chk_tearoff.active?
+       @config.menus_open_all = @chk_open_all.active?
+       @config.back_up_config = @chk_back_up_config.active?
+@@ -1998,13 +1990,6 @@
+       )
+       r += 1
+ 
+-      @chk_hide_border = Gtk::CheckButton.new('hide button _border', true)
+-      @chk_hide_border.active = @config.hide_border?
+-      table.attach(
+-        @chk_hide_border, 0, 1, r, r+1, Gtk::EXPAND|Gtk::FILL, Gtk::FILL, 0, 0
+-      )
+-      r += 1
+-
+       @chk_open_all = Gtk::CheckButton.new(
+         'include "Open all _windows" selection', true
+       )
+diff -ur sshmenu-3.18/sshmenu-applet sshmenu-3.18-pixmap/sshmenu-applet
+--- sshmenu-3.18/sshmenu-applet	2009-08-24 10:25:06.000000000 +0200
++++ sshmenu-3.18-pixmap/sshmenu-applet	2010-08-07 19:31:59.000000000 +0200
+@@ -15,7 +15,13 @@
+ PanelApplet.main("OAFIID:GNOME_SSHMenuApplet_Factory",
+                  "SSH Menu Applet", "0.1") do |applet, iid|
+   if iid == "OAFIID:GNOME_SSHMenuApplet"
+-    app = GnomeSSHMenu::Factory.make_app(:window => applet, :args => [])
++    if applet.orient == PanelApplet::ORIENT_UP || applet.orient == PanelApplet::ORIENT_DOWN
++      orient = 1
++    else
++      orient = 0
++    end
++    app = GnomeSSHMenu::Factory.make_app(:window => applet, :applet => orient, :args => [])
++    applet.set_flags PanelApplet::EXPAND_MINOR
+     applet.show
+     true
+   else
