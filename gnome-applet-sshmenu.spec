@@ -4,18 +4,19 @@ Version:	3.18
 Release:	1
 License:	BSD-like
 Group:		Applications
-Source0:	http://dl.sourceforge.net/sshmenu/sshmenu-%{version}.tar.gz
+Source0:	http://downloads.sourceforge.net/sshmenu/sshmenu-%{version}.tar.gz
 # Source0-md5:	7e7f43135fd112be3c173ec8585d6b98
 Patch0:		%{name}-ruby19.patch
 Patch1:		%{name}-undebianize.patch
 Patch2:		%{name}-pixmap.patch
 URL:		http://sshmenu.sourceforge.net/
+BuildRequires:	ruby-modules
 Requires:	ruby-gnome2
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
 SSHMenu is a GNOME panel applet that keeps all your regular SSH
-connections within a single mouse click. 
+connections within a single mouse click.
 
 %package -n bash-completion-sshmenu
 Summary:	bash-completion for sshmenu
