@@ -32,9 +32,9 @@ Pakiet ten dostarcza bashowe uzupełnianie nazw dla sshmenu.
 
 %prep
 %setup -q -n sshmenu-%{version}
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
+%patch -P0 -p1
+%patch -P1 -p1
+%patch -P2 -p1
 
 sed -i -e 's|/usr/lib$|%{_libdir}/|g' \
        -e 's|gnome-panel/sshmenu-applet|sshmenu-applet|g' Makefile
